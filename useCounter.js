@@ -1,22 +1,23 @@
-/**
- * useCounter: custom hook que nos permite trabajar un contador de forma reutilizable.
- * Devuelve el estado, el incremento, el decremento y el reseteo
- */
+import { useState } from "react";
 
-import { useState } from "react"
+export const useCounter = (initialValue = 1, iteration = 1, max = 50) => {
+  const [counter, setCounter] = useState(initialValue);
 
-export function useCounter(initialState = 10) {
-    const [counter, setCounter] = useState(initialState)
-    
-    const increment = () => {
-        setCounter(counter + 1);
-    }
-    const decrement = () => {
-        setCounter(counter - 1);
-    }
-    const reset = () => {
-        setCounter(initialState);
-    }
+  let validateIteration = iteration < 1;
 
-    return {counter, increment, decrement, reset};
+  const handleAdd = () => {
+    if(validateIteration) return;
+    if((counter + iteration) < max)
+      setCounter(counter + iteration);
+  }
+  const handleSubtract = () => {
+    if(validateIteration) return;
+    if(counter - iteration > 0)
+      setCounter(counter - iteration);
+  }
+  const handleReset = () => {
+    setCounter(initialValue);
+  }
+
+  return [counter, handleAdd, handleSubtract, handleReset];
 }

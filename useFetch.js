@@ -1,51 +1,31 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export const useFetch = (url) => {
-  // hook para mantener la referencia cuando el componente esta montado
-  const isMounted = useRef(true);
-  /**
-   * Inicializo los valores de state
-   */
   const [state, setState] = useState({
     data: null,
-    loading: false,
+    loading: true,
     error: null,
   });
 
-  /**
-   * Este useEffect controla el montaje del componente. Para el desmontado, cambia el estado
-   * de la referencia
-   */
-  useEffect(() => {
-    // no genera efecto
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  /**
-   * useEffect: cuando ocurra el renderizado, obtengo como efecto la data esperada.
-   * La condicion que hace que ocurra una sola vez es que se conozca el url (el segundo
-   * argumento con url en el arreglo)
-   */
-  useEffect(() => {
+  const getFetch = async () => {
     setState({
-      data: null,
-      loading: true,
-      error: null,
-    }); // comienzo con los valores por defecto antes del cambio
-    fetch(url)
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (isMounted.current) { // ver el useRef y su useEffect asociado
-          setState({
-            loading: false,
-            error: null,
-            data,
-          });
-        }
-      });
+        ...state,
+        loading: true,
+    });
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    setState({
+        data,
+        loading: false,
+        error: null,
+    });
+  };
+
+  useEffect(() => {
+    getFetch();
   }, [url]);
 
-  return state;
+  return {data: state.data, loading: state.loading, error: state.error};
 };
